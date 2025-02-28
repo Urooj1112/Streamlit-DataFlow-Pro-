@@ -1,6 +1,7 @@
 # Imports
 import streamlit as st
 import pandas as pd
+import matplotlip as plt
 import os 
 from io import BytesIO
 # Set up our App
