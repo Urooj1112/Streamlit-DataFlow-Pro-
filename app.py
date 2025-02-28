@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 import os 
 from io import BytesIO
-import matplotlib.pyplot as plt
 # Set up our App
 st.set_page_config(page_title="DataFlow Pro by Urooj Saeed", layout="wide" )
 st.title("DataFlow Pro")
