@@ -1,11 +1,11 @@
 # Imports
 import streamlit as st
 import pandas as pd
-import matplotlip as plt
 import os 
 from io import BytesIO
+
 # Set up our App
-st.set_page_config(page_title="DataFlow Pro by Urooj Saeed", layout="wide" )
+st.set_page_config(page_title="DataFlow Pro by Urooj Saeed", layout="wide")
 st.title("DataFlow Pro")
 st.write("Effortlessly clean, convert, and visualize your data—turn raw files into insights with a single click!")
 
@@ -25,7 +25,7 @@ if uploaded_files:
 
         # Display info about the file
         st.write(f"**File Name:** {file.name}")
-        st.write(f"**File Size:** {file.size/1024}")
+        st.write(f"**File Size:** {file.size/1024:.2f} KB")
 
         # Show 5 rows of our df
         st.write("Preview the Head of the Dataframe")
@@ -37,15 +37,15 @@ if uploaded_files:
             col1, col2 = st.columns(2)
 
             with col1:
-                if st.button(f"Removed Duplicates from {file.name}"):
+                if st.button(f"Remove Duplicates from {file.name}"):
                     df.drop_duplicates(inplace=True)
                     st.write("Duplicates Removed!")
 
-                with col2:
-                    if st.button(f"Fill Missing Values for {file.name}"):
-                        numeric_cols = df.select_dtypes(include=['number']).columns
-                        df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
-                        st.write("Missing Values have been Failled!")
+            with col2:
+                if st.button(f"Fill Missing Values for {file.name}"):
+                    numeric_cols = df.select_dtypes(include=['number']).columns
+                    df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
+                    st.write("Missing Values have been Filled!")
 
         # Choose Specific Columns to Keep or Convert
         st.subheader("Select Columns to Convert")
@@ -55,37 +55,18 @@ if uploaded_files:
         # Create Some Visualizations
         st.subheader("Data Visualization")
         if st.checkbox(f"Show Visualization for {file.name}"):
-            chart_type = st.radio("Select Chart Type:", ["Bar Chart", "Histogram", "Line Chart", "Scatter Plot", "Area Chart"], key=f"chart_{file.name}")
+            chart_type = st.radio("Select Chart Type:", ["Bar Chart", "Line Chart", "Scatter Plot", "Area Chart"], key=f"chart_{file.name}")
             
             if chart_type == "Bar Chart":
-                st.bar_chart(df.select_dtypes(include='number').iloc[:, :2])
-            elif chart_type == "Histogram":
-                fig, ax = plt.subplots(figsize=(5, 3))
-                df.iloc[:, :2].plot(kind='hist', bins=20, alpha=0.7, ax=ax)
-                ax.set_xlabel(df.columns[0])
-                ax.set_ylabel("Frequency")
-                st.pyplot(fig)
+                st.bar_chart(df.select_dtypes(include='number'))
             elif chart_type == "Line Chart":
-                fig, ax = plt.subplots(figsize=(5, 3))
-                df.iloc[:, :2].plot(kind='line', ax=ax)
-                ax.set_xlabel(df.columns[0])
-                ax.set_ylabel(df.columns[1])
-                st.pyplot(fig)
+                st.line_chart(df.select_dtypes(include='number'))
             elif chart_type == "Scatter Plot":
-                fig, ax = plt.subplots(figsize=(5, 3))
-                ax.scatter(df.iloc[:, 0], df.iloc[:, 1])
-                ax.set_xlabel(df.columns[0])
-                ax.set_ylabel(df.columns[1])
-                st.pyplot(fig)
+                st.scatter_chart(df.select_dtypes(include='number'))
             elif chart_type == "Area Chart":
-                fig, ax = plt.subplots(figsize=(5, 3))
-                df.iloc[:, :2].plot(kind='area', ax=ax, alpha=0.5)
-                ax.set_xlabel(df.columns[0])
-                ax.set_ylabel(df.columns[1])
-                st.pyplot(fig)
+                st.area_chart(df.select_dtypes(include='number'))
 
         # Convert the File -> CSV to Excel 
-         # Convert the File -> CSV to Excel 
         st.subheader("Conversion Options")
         conversion_type = st.radio(f"Convert {file.name} to:", ["CSV", "Excel"], key=file.name)
         if st.button(f"Convert {file.name}"):
@@ -96,9 +77,9 @@ if uploaded_files:
                 mime_type = "text/csv"
 
             elif conversion_type == "Excel":
-                df.to_excel(buffer, index=False)
+                df.to_excel(buffer, index=False, engine='xlsxwriter')
                 file_name = file.name.replace(file_ext, ".xlsx")
-                mime_type = "application/vnd.openxmlformats-officedocumnet.spreadsheetml.sheet"
+                mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             buffer.seek(0)
 
             # Download Button
